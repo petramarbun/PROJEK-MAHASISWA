@@ -1,5 +1,3 @@
-Tentu, saya bantu perbaiki panduannya agar tidak perlu melakukan fork. Berikut adalah versi yang telah diperbaiki:
-
 ## Proyek GitHub untuk Pemula
 
 Selamat datang di proyek kami! Proyek ini adalah tempat yang bagus bagi pemula untuk belajar menggunakan Git dan GitHub. Di bawah ini adalah panduan langkah demi langkah untuk membantu Anda berkontribusi pada proyek ini **tanpa perlu melakukan fork**.
