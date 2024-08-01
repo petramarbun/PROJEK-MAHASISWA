@@ -22,6 +22,7 @@ Selamat datang di proyek kami! Proyek ini adalah tempat yang bagus bagi pemula u
 
     ```bash
     cd PROJEK-MAHASISWA
+    git init
     ```
 
 ## Langkah 2: Membuat Branch Baru
@@ -29,6 +30,7 @@ Selamat datang di proyek kami! Proyek ini adalah tempat yang bagus bagi pemula u
 1. Pastikan Anda berada di branch `master` dan sinkron dengan repository utama:
 
     ```bash
+    git branch -M master
     git checkout master
     git pull
     ```
@@ -74,3 +76,45 @@ Selamat datang di proyek kami! Proyek ini adalah tempat yang bagus bagi pemula u
 4. Klik tombol **Create pull request**.
 
 Selamat berkontribusi!
+
+
+WAJIB:
+Tambahkan remote upstream untuk menjaga repository tetap sinkron.
+
+
+1. Jalankan perintah berikut:
+
+
+```bash
+
+git remote add origin https://github.com/petramarbun/PROJEK-MAHASISWA
+
+git remote add upstream https://github.com/petramarbun/PROJEK-MAHASISWA
+
+```
+
+
+2. Untuk memastikan remote upstream telah ditambahkan, jalankan perintah berikut:
+
+
+```bash
+
+git remote -v
+
+```
+
+
+Anda seharusnya melihat output seperti ini:
+
+
+```plaintext
+
+origin https://github.com/petramarbun/PROJEK-MAHASISWA
+
+origin https://github.com/petramarbun/PROJEK-MAHASISWA
+
+upstream https://github.com/petramarbun/PROJEK-MAHASISWA
+
+upstream https://github.com/petramarbun/PROJEK-MAHASISWA
+
+```
