@@ -3,10 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        nav { background-color: #f8f9fa; padding: 10px; border-bottom: 1px solid #e9ecef; }
+        nav a { margin: 0 10px; text-decoration: none; color: #007bff; }
+        .content { margin: 20px; }
+        .alert { padding: 10px; margin-bottom: 10px; }
+        .alert-success { color: green; }
+        .alert-danger { color: red; }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
-    <h1>cek kodam</h1>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('account') }}">Account</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% for post in posts %}
+            <article>
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content }}</p>
+                <small>Posted by {{ post.author.username }} on {{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            </article>
+        {% endfor %}
+    </div>
 </body>
 </html>
