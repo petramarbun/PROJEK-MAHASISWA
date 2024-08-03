@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, redirect, url_for, flash
+from flask import Flask, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -62,11 +62,11 @@ class PostForm(FlaskForm):
 @app.route("/home")
 def home():
     posts = Post.query.all()
-    return render_template_string(home_template, posts=posts)
+    return "Home Page with Posts"
 
 @app.route("/about")
 def about():
-    return render_template_string(about_template)
+    return "About Page"
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -80,7 +80,7 @@ def register():
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('login'))
-    return render_template_string(register_template, form=form)
+    return "Register Page"
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -94,7 +94,7 @@ def login():
             return redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template_string(login_template, form=form)
+    return "Login Page"
 
 @app.route("/logout")
 def logout():
@@ -104,7 +104,7 @@ def logout():
 @app.route("/account")
 @login_required
 def account():
-    return render_template_string(account_template)
+    return "Account Page"
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
@@ -116,4 +116,7 @@ def new_post():
         db.session.commit()
         flash('Your post has been created!', 'success')
         return redirect(url_for('home'))
-    return render_template_string(create_post_template, form=form)
+    return "Create Post Page"
+
+if __name__ == '__main__':
+    app.run(debug=True)
