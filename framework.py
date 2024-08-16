@@ -19,11 +19,12 @@ def index():
     if 'history' not in session:
         session['history'] = []
         session['total'] = 0  # Pastikan total diinisialisasi sebagai integer
+        session['mode'] = 'add'  # Set mode default
 
     # Handle input baru
     if request.method == 'POST':
         nilai = request.form.get('nilai', '')
-        mode = request.form.get('mode', 'add')  # Ambil mode dari form atau default ke 'add'
+        mode = request.form.get('mode', session['mode'])  # Ambil mode dari form atau dari session
 
         try:
             nilai = int(nilai)
@@ -32,6 +33,7 @@ def index():
             elif mode == 'subtract':
                 total = session.get('total', 0) - nilai
             session['total'] = total  # Update total di session
+            session['mode'] = mode  # Simpan mode ke session
 
             # Tambah riwayat baru ke session
             session['history'].append({
@@ -48,6 +50,7 @@ def index():
     elif request.args.get('action') == 'clear':
         session.pop('history', None)
         session.pop('total', None)
+        session.pop('mode', None)
         return redirect(url_for('index'))
 
     else:
@@ -55,138 +58,68 @@ def index():
 
     form_html = '''
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #fff1e1;
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        @layer base {
+          :root {
+            --background: 210 100% 97%;
+            --foreground: 339 20% 20%;
+            --primary: 308 56% 85%;
+            --primary-foreground: 210 22% 22%;
+            --secondary: 196 75% 88%;
+            --secondary-foreground: 210 22% 22%;
+            --accent: 211 86% 70%;
+            --accent-foreground: 210 22% 22%;
+            --destructive: 0 93% 73%;
+            --destructive-foreground: 210 22% 22%;
+            --muted: 210 100% 95%;
+            --muted-foreground: 210 22% 22%;
+            --card: 210 100% 97%;
+            --card-foreground: 210 22% 22%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 341 20% 22%;
+            --border: 210 40% 80%;
+            --input: 210 40% 56%;
+            --ring: 210 40% 60%;
+            --radius: 1rem;
+          }
         }
+
+        @layer base {
+          * {
+            @apply border-border;
+          }
+
+          body {
+            @apply bg-background text-foreground font-body;
+          }
+
+          h1, h2, h3, h4, h5, h6 {
+            @apply font-heading;
+          }
+        }
+
         .navbar {
-            background-color: #1d3c45;
-            overflow: hidden;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 1000; /* Pastikan navbar tetap di atas elemen lain */
+            @apply bg-[#006989] overflow-hidden sticky top-0 w-full z-50;
         }
+
         .navbar a {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
+            @apply float-left block text-[#F3F7EC] text-center py-3 px-5 no-underline relative;
         }
+
+        .navbar a::before {
+            content: '';
+            @apply absolute left-1/2 top-1/2 w-0 h-0 bg-gradient-to-r from-[#E88D67] to-transparent rounded-full transition-all duration-300 ease-in-out z-[-1];
+        }
+
+        .navbar a:hover::before {
+            @apply w-full h-full left-0 top-0;
+        }
+
         .navbar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-        form {
-            background-color: white;
-            padding: 20px;
-            margin: 20px auto;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .tabs {
-            display: flex;
-            cursor: pointer;
-            border-bottom: 2px solid #1d3c45;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            margin-right: 2px;
-        }
-        .tab.active {
-            background-color: #ffffff;
-            border-color: #1d3c45;
-            font-weight: bold;
-        }
-        .tab-content {
-            display: none;
-            width: 100%;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .input-container {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        input[type="text"] {
-            width: calc(100% - 40px); /* Adjust width to accommodate smaller clear button */
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[type="submit"], .clear-btn {
-            background-color: #d2601a;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        input[type="submit"]:hover, .clear-btn:hover {
-            background-color: #b24f14; /* Warna hover yang lebih gelap untuk tombol */
-        }
-        .clear-btn {
-            background-color: #d2601a;
-            color: white;
-            width: 1px; /* Smaller width */
-            height: 16px; /* Smaller height */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 14px; /* Smaller font size */
-            margin-left: 10px;
-            text-decoration: none;
-        }
-        .clear-btn:hover {
-            background-color: #ff4d4d; /* Warna merah saat hover */
-        }
-        .result, .history {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: 20px auto;
-        }
-        .result {
-            border-left: 6px solid #1d3c45;
-        }
-        .history {
-            border-left: 6px solid #d2601a;
-        }
-        .history ul {
-            list-style-type: decimal; /* Ganti dengan decimal untuk nomor urut */
-            padding: 0;
-        }
-        .history li {
-            padding: 5px 0;
-        }
-        .total {
-            font-weight: bold;
-            margin-top: 10px;
+            @apply text-[#005C78];
         }
     </style>
 
@@ -196,29 +129,17 @@ def index():
     </div>
 
     <form method="post">
-        <div class="tabs">
-            <div class="tab active" onclick="openTab('add')">Tambah</div>
-            <div class="tab" onclick="openTab('subtract')">Kurang</div>
+        <div class="button-container">
+            <button type="button" class="mode-button {{ 'active' if session['mode'] == 'add' else '' }}" onclick="setMode('add')">+</button>
+            <button type="button" class="mode-button {{ 'active' if session['mode'] == 'subtract' else '' }}" onclick="setMode('subtract')">-</button>
         </div>
 
-        <div id="add" class="tab-content active">
-            <div class="input-container">
-                <label for="nilai">Masukkan nilai:</label>
-                <input type="text" id="nilai" name="nilai">
-                <a href="/?action=clear" class="clear-btn" title="Clear Riwayat">🗑️</a>
-            </div>
-            <input type="hidden" name="mode" value="add">
+        <div class="input-container">
+            <label for="nilai">Masukkan nilai:</label>
+            <input type="text" id="nilai" name="nilai">
+            <a href="/?action=clear" class="clear-btn" title="Clear Riwayat">🗑️</a>
         </div>
-
-        <div id="subtract" class="tab-content">
-            <div class="input-container">
-                <label for="nilai">Masukkan nilai:</label>
-                <input type="text" id="nilai" name="nilai">
-                <a href="/?action=clear" class="clear-btn" title="Clear Riwayat">🗑️</a>
-            </div>
-            <input type="hidden" name="mode" value="subtract">
-        </div>
-
+        <input type="hidden" name="mode" id="mode" value="{{ session['mode'] }}"> <!-- Default mode diambil dari session -->
         <input type="submit" value="Simpan">
     </form>
     '''
@@ -237,19 +158,21 @@ def index():
 
     form_html += '''
     <script>
-        function openTab(tabName) {
-            var i, tabcontent, tabs;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+        function setMode(mode) {
+            document.getElementById('mode').value = mode;
+            var buttons = document.getElementsByClassName('mode-button');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
             }
-            tabs = document.getElementsByClassName("tab");
-            for (i = 0; i < tabs.length; i++) {
-                tabs[i].className = tabs[i].className.replace(" active", "");
+            if (mode === 'add') {
+                buttons[0].classList.add('active');
+            } else if (mode === 'subtract') {
+                buttons[1].classList.add('active');
             }
-            document.getElementById(tabName).style.display = "block";
-            document.querySelector(".tab." + tabName).className += " active";
         }
+
+        // Set default mode dari session
+        setMode('{{ session["mode"] }}');
     </script>
     '''
 
@@ -259,38 +182,68 @@ def index():
 def about():
     about_html = '''
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #fff1e1;
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        @layer base {
+          :root {
+            --background: 210 100% 97%;
+            --foreground: 339 20% 20%;
+            --primary: 308 56% 85%;
+            --primary-foreground: 210 22% 22%;
+            --secondary: 196 75% 88%;
+            --secondary-foreground: 210 22% 22%;
+            --accent: 211 86% 70%;
+            --accent-foreground: 210 22% 22%;
+            --destructive: 0 93% 73%;
+            --destructive-foreground: 210 22% 22%;
+            --muted: 210 100% 95%;
+            --muted-foreground: 210 22% 22%;
+            --card: 210 100% 97%;
+            --card-foreground: 210 22% 22%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 341 20% 22%;
+            --border: 210 40% 80%;
+            --input: 210 40% 56%;
+            --ring: 210 40% 60%;
+            --radius: 1rem;
+          }
         }
+
+        @layer base {
+          * {
+            @apply border-border;
+          }
+
+          body {
+            @apply bg-background text-foreground font-body;
+          }
+
+          h1, h2, h3, h4, h5, h6 {
+            @apply font-heading;
+          }
+        }
+
         .navbar {
-            background-color: #1d3c45;
-            overflow: hidden;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 1000; /* Pastikan navbar tetap di atas elemen lain */
+            @apply bg-[#006989] overflow-hidden sticky top-0 w-full z-50;
         }
+
         .navbar a {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
+            @apply float-left block text-[#F3F7EC] text-center py-3 px-5 no-underline relative;
         }
+
+        .navbar a::before {
+            content: '';
+            @apply absolute left-1/2 top-1/2 w-0 h-0 bg-gradient-to-r from-[#E88D67] to-transparent rounded-full transition-all duration-300 ease-in-out z-[-1];
+        }
+
+        .navbar a:hover::before {
+            @apply w-full h-full left-0 top-0;
+        }
+
         .navbar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-        .content {
-            padding: 20px;
-            max-width: 800px;
-            margin: auto;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            @apply text-[#005C78];
         }
     </style>
 
@@ -299,12 +252,8 @@ def about():
         <a href="/about">About</a>
     </div>
 
-    <div class="content">
-        <h1>Sejarah Kalkulator</h1>
-        <p>Kalkulator adalah alat yang digunakan untuk melakukan perhitungan matematika. Sejarahnya dimulai sejak zaman kuno dengan alat-alat sederhana seperti abakus...</p>
-        <p>Dengan kemajuan teknologi, kalkulator menjadi lebih kompleks dan dapat melakukan berbagai operasi aritmatika serta fungsi matematika canggih lainnya. Kalkulator digital pertama kali diperkenalkan pada tahun 1960-an dan terus berkembang hingga saat ini...</p>
-        <p>Untuk informasi lebih lanjut, silakan kunjungi situs web kami atau hubungi kami melalui formulir kontak.</p>
-    </div>
+    <h1>About</h1>
+    <p>This is the about page.</p>
     '''
 
     return render_template_string(about_html)
