@@ -2,9 +2,8 @@ from flask import Flask, request, render_template_string, session, redirect, url
 import locale
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Kunci rahasia untuk session
+app.secret_key = 'supersecretkey'
 
-# Set locale untuk pemformatan angka
 locale.setlocale(locale.LC_ALL, '')
 
 def format_rupiah(value):
@@ -15,16 +14,14 @@ def format_rupiah(value):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Inisialisasi riwayat dan total jika belum ada di session
     if 'history' not in session:
         session['history'] = []
-        session['total'] = 0  # Pastikan total diinisialisasi sebagai integer
-        session['mode'] = 'add'  # Set mode default
+        session['total'] = 0
+        session['mode'] = 'add'
 
-    # Handle input baru
     if request.method == 'POST':
         nilai = request.form.get('nilai', '')
-        mode = request.form.get('mode', session['mode'])  # Ambil mode dari form atau dari session
+        mode = request.form.get('mode', session['mode'])
 
         try:
             nilai = int(nilai)
@@ -32,17 +29,16 @@ def index():
                 total = session.get('total', 0) + nilai
             elif mode == 'subtract':
                 total = session.get('total', 0) - nilai
-            session['total'] = total  # Update total di session
-            session['mode'] = mode  # Simpan mode ke session
+            session['total'] = total
+            session['mode'] = mode
 
-            # Tambah riwayat baru ke session
             session['history'].append({
                 'nilai': nilai,
                 'total': total,
                 'mode': 'Penambahan' if mode == 'add' else 'Pengurangan'
             })
 
-            hasil = format_rupiah(total)  # Tampilkan hasil terbaru
+            hasil = format_rupiah(total)
 
         except ValueError:
             hasil = "Masukkan angka yang valid"
@@ -61,10 +57,11 @@ def index():
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #F3F7EC; /* Background utama */
+            background-color: #F3F7EC;
+            color: #333;
         }
         .navbar {
-            background-color: #006989; /* Navbar background color */
+            background-color: #006989;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -74,7 +71,7 @@ def index():
         .navbar a {
             float: left;
             display: block;
-            color: #F3F7EC; /* Navbar link color */
+            color: #F3F7EC;
             text-align: center;
             padding: 14px 20px;
             text-decoration: none;
@@ -88,7 +85,7 @@ def index():
             left: 50%;
             width: 0;
             height: 0;
-            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%); /* Gradiasi */
+            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             transition: width 0.4s ease, height 0.4s ease;
@@ -134,7 +131,7 @@ def index():
             background-color: #d2601a;
         }
         .mode-button:hover {
-            background-color: #c57d4a; /* Button hover color */
+            background-color: #c57d4a;
         }
         .input-container {
             display: flex;
@@ -150,7 +147,7 @@ def index():
             border-radius: 4px;
         }
         input[type="submit"], .clear-btn {
-            background-color: #E88D67; /* Button background color */
+            background-color: #E88D67;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -160,7 +157,7 @@ def index():
             transition: background-color 0.3s ease;
         }
         input[type="submit"]:hover, .clear-btn:hover {
-            background-color: #c57d4a; /* Button hover color */
+            background-color: #c57d4a;
         }
         .clear-btn {
             background-color: #E88D67;
@@ -177,12 +174,12 @@ def index():
             transition: background-color 0.3s ease;
         }
         .clear-btn:hover {
-            background-color: #ff4d4d; /* Clear button hover color */
+            background-color: #ff4d4d;
         }
         .result, .history {
             margin-top: 20px;
             padding: 20px;
-            background-color: #F3F7EC; /* Background color for results and history */
+            background-color: #F3F7EC;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -190,10 +187,10 @@ def index():
             margin: 20px auto;
         }
         .result {
-            border-left: 6px solid #006989; /* Border color for result */
+            border-left: 6px solid #006989;
         }
         .history {
-            border-left: 6px solid #E88D67; /* Border color for history */
+            border-left: 6px solid #E88D67;
         }
         .history ul {
             list-style-type: decimal;
@@ -206,11 +203,31 @@ def index():
             font-weight: bold;
             margin-top: 10px;
         }
+        .dark-mode {
+            background-color: #333;
+            color: #F3F7EC;
+        }
+        .dark-mode form, .dark-mode .result, .dark-mode .history {
+            background-color: #444;
+            border-color: #555;
+        }
+        .dark-mode input[type="text"] {
+            border-color: #666;
+            background-color: #555;
+            color: #F3F7EC;
+        }
+        .dark-mode input[type="submit"], .dark-mode .clear-btn {
+            background-color: #555;
+        }
+        .dark-mode input[type="submit"]:hover, .dark-mode .clear-btn:hover {
+            background-color: #666;
+        }
     </style>
 
     <div class="navbar">
         <a href="/">Home</a>
         <a href="/about">About</a>
+        <a href="javascript:void(0);" onclick="toggleDarkMode()">Toggle Dark Mode</a>
     </div>
 
     <form method="post">
@@ -224,24 +241,10 @@ def index():
             <input type="text" id="nilai" name="nilai">
             <a href="/?action=clear" class="clear-btn" title="Clear Riwayat">🗑️</a>
         </div>
-        <input type="hidden" name="mode" id="mode" value="{{ session['mode'] }}"> <!-- Default mode diambil dari session -->
+        <input type="hidden" name="mode" id="mode" value="{{ session['mode'] }}">
         <input type="submit" value="Simpan">
     </form>
-    '''
 
-    if hasil is not None:
-        form_html += f'<div class="result">Hasil: {hasil}</div>'
-
-    # Tampilkan riwayat
-    if session['history']:
-        form_html += '<div class="history"><h3>Riwayat Nilai:</h3><ul>'
-        for entry in session['history']:
-            formatted_nilai = format_rupiah(entry['nilai'])
-            formatted_total = format_rupiah(entry['total'])
-            form_html += f'<li>{formatted_nilai} = {formatted_total}</li>'
-        form_html += f'</ul><div class="total">Total Keseluruhan: {format_rupiah(session["total"])}</div></div>'
-
-    form_html += '''
     <script>
         function setMode(mode) {
             document.getElementById('mode').value = mode;
@@ -251,8 +254,23 @@ def index():
             }
             event.target.classList.add('active');
         }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
     </script>
     '''
+
+    if hasil is not None:
+        form_html += f'<div class="result">Hasil: {hasil}</div>'
+
+    if session['history']:
+        form_html += '<div class="history"><h3>Riwayat Nilai:</h3><ul>'
+        for entry in session['history']:
+            formatted_nilai = format_rupiah(entry['nilai'])
+            formatted_total = format_rupiah(entry['total'])
+            form_html += f'<li>{formatted_nilai} = {formatted_total}</li>'
+        form_html += f'</ul><div class="total">Total Keseluruhan: {format_rupiah(session["total"])}</div></div>'
 
     return render_template_string(form_html)
 
@@ -263,10 +281,11 @@ def about():
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #F3F7EC; /* Background utama */
+            background-color: #F3F7EC;
+            color: #333;
         }
         .navbar {
-            background-color: #006989; /* Navbar background color */
+            background-color: #006989;
             overflow: hidden;
             position: sticky;
             top: 0;
@@ -276,7 +295,7 @@ def about():
         .navbar a {
             float: left;
             display: block;
-            color: #F3F7EC; /* Navbar link color */
+            color: #F3F7EC;
             text-align: center;
             padding: 14px 20px;
             text-decoration: none;
@@ -290,7 +309,7 @@ def about():
             left: 50%;
             width: 0;
             height: 0;
-            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%); /* Gradiasi */
+            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             transition: width 0.4s ease, height 0.4s ease;
