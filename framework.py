@@ -58,68 +58,153 @@ def index():
 
     form_html = '''
     <style>
-        @tailwind base;
-        @tailwind components;
-        @tailwind utilities;
-
-        @layer base {
-          :root {
-            --background: 210 100% 97%;
-            --foreground: 339 20% 20%;
-            --primary: 308 56% 85%;
-            --primary-foreground: 210 22% 22%;
-            --secondary: 196 75% 88%;
-            --secondary-foreground: 210 22% 22%;
-            --accent: 211 86% 70%;
-            --accent-foreground: 210 22% 22%;
-            --destructive: 0 93% 73%;
-            --destructive-foreground: 210 22% 22%;
-            --muted: 210 100% 95%;
-            --muted-foreground: 210 22% 22%;
-            --card: 210 100% 97%;
-            --card-foreground: 210 22% 22%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 341 20% 22%;
-            --border: 210 40% 80%;
-            --input: 210 40% 56%;
-            --ring: 210 40% 60%;
-            --radius: 1rem;
-          }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #F3F7EC; /* Background utama */
         }
-
-        @layer base {
-          * {
-            @apply border-border;
-          }
-
-          body {
-            @apply bg-background text-foreground font-body;
-          }
-
-          h1, h2, h3, h4, h5, h6 {
-            @apply font-heading;
-          }
-        }
-
         .navbar {
-            @apply bg-[#006989] overflow-hidden sticky top-0 w-full z-50;
+            background-color: #006989; /* Navbar background color */
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
-
         .navbar a {
-            @apply float-left block text-[#F3F7EC] text-center py-3 px-5 no-underline relative;
+            float: left;
+            display: block;
+            color: #F3F7EC; /* Navbar link color */
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
         }
-
         .navbar a::before {
-            content: '';
-            @apply absolute left-1/2 top-1/2 w-0 h-0 bg-gradient-to-r from-[#E88D67] to-transparent rounded-full transition-all duration-300 ease-in-out z-[-1];
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%); /* Gradiasi */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: -1;
         }
-
         .navbar a:hover::before {
-            @apply w-full h-full left-0 top-0;
+            width: 150%;
+            height: 150%;
         }
-
         .navbar a:hover {
-            @apply text-[#005C78];
+            color: white;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .button-container {
+            margin-bottom: 10px;
+        }
+        .mode-button {
+            display: inline-block;
+            transition: all 0.2s ease-in;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            color: #090909;
+            padding: 0.7em 1.7em;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 0.5em;
+            background: #e8e8e8;
+            border: 1px solid #e8e8e8;
+            box-shadow: 6px 6px 12px #c5c5c5, -6px -6px 12px #ffffff;
+        }
+        .mode-button.active {
+            background-color: #d2601a;
+        }
+        .mode-button:hover {
+            background-color: #c57d4a; /* Button hover color */
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        input[type="text"] {
+            width: calc(100% - 50px);
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"], .clear-btn {
+            background-color: #E88D67; /* Button background color */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover, .clear-btn:hover {
+            background-color: #c57d4a; /* Button hover color */
+        }
+        .clear-btn {
+            background-color: #E88D67;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 16px;
+            margin-left: 10px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .clear-btn:hover {
+            background-color: #ff4d4d; /* Clear button hover color */
+        }
+        .result, .history {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #F3F7EC; /* Background color for results and history */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .result {
+            border-left: 6px solid #006989; /* Border color for result */
+        }
+        .history {
+            border-left: 6px solid #E88D67; /* Border color for history */
+        }
+        .history ul {
+            list-style-type: decimal;
+            padding: 0;
+        }
+        .history li {
+            padding: 5px 0;
+        }
+        .total {
+            font-weight: bold;
+            margin-top: 10px;
         }
     </style>
 
@@ -164,15 +249,8 @@ def index():
             for (var i = 0; i < buttons.length; i++) {
                 buttons[i].classList.remove('active');
             }
-            if (mode === 'add') {
-                buttons[0].classList.add('active');
-            } else if (mode === 'subtract') {
-                buttons[1].classList.add('active');
-            }
+            event.target.classList.add('active');
         }
-
-        // Set default mode dari session
-        setMode('{{ session["mode"] }}');
     </script>
     '''
 
@@ -182,68 +260,56 @@ def index():
 def about():
     about_html = '''
     <style>
-        @tailwind base;
-        @tailwind components;
-        @tailwind utilities;
-
-        @layer base {
-          :root {
-            --background: 210 100% 97%;
-            --foreground: 339 20% 20%;
-            --primary: 308 56% 85%;
-            --primary-foreground: 210 22% 22%;
-            --secondary: 196 75% 88%;
-            --secondary-foreground: 210 22% 22%;
-            --accent: 211 86% 70%;
-            --accent-foreground: 210 22% 22%;
-            --destructive: 0 93% 73%;
-            --destructive-foreground: 210 22% 22%;
-            --muted: 210 100% 95%;
-            --muted-foreground: 210 22% 22%;
-            --card: 210 100% 97%;
-            --card-foreground: 210 22% 22%;
-            --popover: 0 0% 100%;
-            --popover-foreground: 341 20% 22%;
-            --border: 210 40% 80%;
-            --input: 210 40% 56%;
-            --ring: 210 40% 60%;
-            --radius: 1rem;
-          }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #F3F7EC; /* Background utama */
         }
-
-        @layer base {
-          * {
-            @apply border-border;
-          }
-
-          body {
-            @apply bg-background text-foreground font-body;
-          }
-
-          h1, h2, h3, h4, h5, h6 {
-            @apply font-heading;
-          }
-        }
-
         .navbar {
-            @apply bg-[#006989] overflow-hidden sticky top-0 w-full z-50;
+            background-color: #006989; /* Navbar background color */
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
-
         .navbar a {
-            @apply float-left block text-[#F3F7EC] text-center py-3 px-5 no-underline relative;
+            float: left;
+            display: block;
+            color: #F3F7EC; /* Navbar link color */
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
         }
-
         .navbar a::before {
-            content: '';
-            @apply absolute left-1/2 top-1/2 w-0 h-0 bg-gradient-to-r from-[#E88D67] to-transparent rounded-full transition-all duration-300 ease-in-out z-[-1];
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(232,141,103,1) 0%, rgba(101,197,211,1) 100%); /* Gradiasi */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: -1;
         }
-
         .navbar a:hover::before {
-            @apply w-full h-full left-0 top-0;
+            width: 150%;
+            height: 150%;
         }
-
         .navbar a:hover {
-            @apply text-[#005C78];
+            color: white;
+        }
+        .content {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 
@@ -252,8 +318,12 @@ def about():
         <a href="/about">About</a>
     </div>
 
-    <h1>About</h1>
-    <p>This is the about page.</p>
+    <div class="content">
+        <h1>Sejarah Kalkulator</h1>
+        <p>Kalkulator adalah alat yang digunakan untuk melakukan perhitungan matematika. Sejarahnya dimulai sejak zaman kuno dengan alat-alat sederhana seperti abakus...</p>
+        <p>Dengan kemajuan teknologi, kalkulator menjadi lebih kompleks dan dapat melakukan berbagai operasi aritmatika serta fungsi matematika canggih lainnya. Kalkulator digital pertama kali diperkenalkan pada tahun 1960-an dan terus berkembang hingga saat ini...</p>
+        <p>Untuk informasi lebih lanjut, silakan kunjungi situs web kami atau hubungi kami melalui formulir kontak.</p>
+    </div>
     '''
 
     return render_template_string(about_html)
